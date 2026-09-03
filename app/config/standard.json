@@ -1,0 +1,19 @@
+{
+    "starting_level": {
+        "offset_rom" : "3D59B",
+        "page"       : "0F",
+        "offset_page": "959B"
+    },
+    "level_parsing":{
+        "max_bytes+per_level" : 35,
+        "ending_symbol"       : "FF",
+        "max_levels"          : 99
+    },
+    "palettes": {
+        "max_bubble_colors" : "28",
+        "offset_rom"        : "3E3A5",
+        "page"              : "0F",
+        "offset_page"       : "A3A5"
+    }
+}
+03 D5 9B 00 01 33
