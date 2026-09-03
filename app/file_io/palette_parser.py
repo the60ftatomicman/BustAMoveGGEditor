@@ -1,7 +1,7 @@
 """Palette Parser"""
 from app.file_io.offset import UniversalOffset
 from app.file_io.file_io import parse_rom
-from app.data_structures.color_engine import Colors
+from app.data_structures.color_structure import Colors
 
 CONST_PALETTE_LENGTH    = 28
 CONST_PALETTE_ADDRESS   = UniversalOffset(offsetHex="0x3E3A5")

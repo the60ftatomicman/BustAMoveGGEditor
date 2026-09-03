@@ -40,14 +40,14 @@ class EditorApp(tk.Tk):
     def _build_toolbar(self):
         toolbar = tk.Frame(self, padx=8, pady=8)
         toolbar.pack(side=tk.TOP, fill=tk.X)
-
+        ## Converted over controls
         self.cellsize_control   = gridsize_selector(toolbar)
         self.cellsize_control.element.bind("<<ComboboxSelected>>", self._on_cell_size_changed)
         self.background_control = background_selector(toolbar)
         self.background_control.element.bind("<<ComboboxSelected>>", lambda event: self.background_control.on_changed(event, "Hackapoo"))
         self.level_control      = level_selector(toolbar,ROM_PATH)
         self.level_control.element.bind("<<ComboboxSelected>>", lambda event: self.level_control.on_changed(event, "Hackapoo"))
-
+        ## TBD
         palette_frame = tk.Frame(self, padx=8)
         palette_frame.pack(side=tk.TOP, fill=tk.X, pady=(0, 8))
         self.palette_colors = PaletteParse(rompath=ROM_PATH)

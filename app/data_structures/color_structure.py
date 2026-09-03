@@ -119,7 +119,6 @@ class Colors:
             ColorType.HEXRGB:   f"{b:02X}"
         }
 
-
     def toGGTuple(self) -> tuple:
         """
         despite being read in as 0bgr, we want to output as GR0B
