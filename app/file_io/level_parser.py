@@ -1,15 +1,14 @@
 """Level Parser"""
-from app.file_io.offset import LevelTableOffset,UniversalOffset
+from app.file_io.offset import LevelTableOffset
 from app.file_io.file_io import parse_rom
 
 CONST_LEVEL_END_SYMBOL = "FF"
 CONST_LEVEL_WIDTH  = 8
 CONST_LEVEL_HEIGHT = 9
 CONST_LEVEL_LENGTH = 35
-#CONST_START_OFFSET = UniversalOffset(offsetHex="0x3D59B")
 
 class LevelParse:
-    def __init__(self,rompath:str=None,lvlIdx:int=1,offset:LevelTableOffset=None,width:int=CONST_LEVEL_WIDTH,height:int=CONST_LEVEL_WIDTH):
+    def __init__(self,rompath:str=None,lvlIdx:int=1,offset:LevelTableOffset=None,width:int=CONST_LEVEL_WIDTH,height:int=CONST_LEVEL_HEIGHT):
         self.rom_path     = rompath
         if self.rom_path == None:
             print(f"LevelParse:rompath is None! Set again")
@@ -27,8 +26,7 @@ class LevelParse:
 
     def setOffset(self,lvlIdx:int=None):
         useIdx = lvlIdx if lvlIdx != None else self.level_index
-        #useOffset =  CONST_START_OFFSET.getInt() + ((useIdx-1) * CONST_LEVEL_LENGTH)
-        self.offset = LevelTableOffset(index=useIdx-1)
+        self.offset = LevelTableOffset(index=useIdx)
 
     def getOffsetInt(self):
         return self.offset.getInt()

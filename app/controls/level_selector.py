@@ -3,6 +3,7 @@ import tkinter as tk
 from tkinter import ttk
 from app.file_io.level_parser import LevelParse
 from app.file_io.offset import BackgroundTableOffset
+from app.data_structures.game_structures import LEVEL_MIN,LEVEL_MAX
 
 ## TODO -- do we want the level to be a levelParse or LevelOffset?
 @dataclass
@@ -12,10 +13,6 @@ class Level:
     bgOffset: BackgroundTableOffset
 
 DEFAULT_LEVEL = 1
-LEVEL_MIN = 1
-LEVEL_MAX = 99
-
-
 class level_selector():
     def __init__(self,parentFrame:tk.Frame=None,rompath:str=None):
         self.options    = None

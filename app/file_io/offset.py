@@ -30,23 +30,34 @@ class UniversalOffset:
 ## (usually the level number) and get the offset for that index. The starting offsets are defined in the constants below.
 ##
 ##
+class TableOffset(UniversalOffset):
+    def __init__(self,name:str="UnknownTableOffset",startIdx:str=None,idx:int=None,entryByteLength:int=None):
+        if startIdx == None:
+            print(f"LevelTableOffset[{name}]: Please provide a startIdx")
+        if idx == None:
+            print(f"LevelTableOffset[{name}]: Please provide a idx")
+        if entryByteLength == None:
+            print(f"LevelTableOffset[{name}]: Please provide a entryByteLength")
+        offInt = int(startIdx, 16) + ((idx-1) * entryByteLength)
+        super().__init__(offsetInt=offInt, offsetHex=None)
 
 # This is used to find the bubble layout data, or "level" data.
-class LevelTableOffset(UniversalOffset):
+class LevelTableOffset(TableOffset):
     CONST_LEVEL_LENGTH       = 35
     CONST_OFFSET_LEVEL_START = "0x3D59B"
     def __init__(self,index:int=None):
-        if index == None:
-            print(f"LevelTableOffset:set the index")
-        offInt = int(self.CONST_OFFSET_LEVEL_START, 16) + (index * self.CONST_LEVEL_LENGTH)
-        super().__init__(offsetInt=offInt, offsetHex=None)
+        super().__init__(name="LevelTableOffset",startIdx=self.CONST_OFFSET_LEVEL_START,idx=index,entryByteLength=self.CONST_LEVEL_LENGTH)
 
 # This is used to find the index of the background we use for a level
-class BackgroundTableOffset(UniversalOffset):
+class BackgroundTableOffset(TableOffset):
     CONST_OFFSET_BG_LENGTH = 1
     CONST_OFFSET_BG_START = "0x0392B"
     def __init__(self,index:int=None):
-        if index == None:
-            print(f"BackgroundTableOffset:set the index")
-        offInt = int(self.CONST_OFFSET_BG_START, 16) + (index * self.CONST_OFFSET_BG_LENGTH)
-        super().__init__(offsetInt=offInt, offsetHex=None)
+        super().__init__(name="BackgroundTableOffset",startIdx=self.CONST_OFFSET_BG_START,idx=index,entryByteLength=self.CONST_OFFSET_BG_LENGTH)
+
+# This is used to fetch our palettes
+class PaletteTableOffset(TableOffset):
+    CONST_OFFSET_PL_LENGTH = 2
+    CONST_OFFSET_PL_START  = "0x3E3A5"
+    def __init__(self,index:int=None):
+        super().__init__(name="BackgroundTableOffset",startIdx=self.CONST_OFFSET_PL_START,idx=index,entryByteLength=self.CONST_OFFSET_PL_LENGTH)
