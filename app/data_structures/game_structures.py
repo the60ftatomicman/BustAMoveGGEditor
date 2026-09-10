@@ -1,27 +1,40 @@
 
+from app.file_io.file_io import parse_rom
 from app.file_io.offset import UniversalOffset,BackgroundTableOffset
 from app.file_io.level_parser import LevelParse,CONST_LEVEL_HEIGHT,CONST_LEVEL_WIDTH
 from app.file_io.export_formats import JSONExport_Game
 from app.data_structures.trackable_data import TrackableData
-
+from dataclasses import asdict
+from app.file_io.palette_parser import PaletteParse
+from app.data_structures.color_structure import Colors
+#
+#
+#
+class Struct_Palette:
+    def __init__(self,offset:UniversalOffset=None,color:Colors=None):
+        self.offset     = offset
+        self.color      = TrackableData()
+        self.color.data = color
+#
+#
+#
 class Struct_Background:
-    def __init__(self,index:int=None,offset:UniversalOffset=None,bgIdx:int=0):
-        self.index      = index
+    def __init__(self,offset:UniversalOffset=None,bgIdx:int=0):
         self.offset     = offset
         self.bgIdx      = TrackableData()
         self.bgIdx.data = bgIdx
-
+#
+#
+#
 class Struct_Level():
     def __init__(self,index:int=None,offset:UniversalOffset=None,background:Struct_Background=None,bubbles=None):
         # Static Elements
         self.index       = index
-        self.offset      = TrackableData() # TODO -- why would THIS be different?
-        self.offset.data = offset
+        self.offset      = offset
         #Configuraable Elements
-        self.bubbles     = TrackableData()
+        self.bubbles      = TrackableData()
         self.bubbles.data = bubbles
-        self.background  = TrackableData()
-        self.background.data = background
+        self.background   = background
 
     def getBubblesAsAsciiDiagram(self):
         bubbles = self.bubbles.data
@@ -49,13 +62,15 @@ class Struct_Level():
             result += row + "\r\n"
         result += "   ----------------"
         return result
+    
     def __str__(self):
         rt  = f"---- Level [{self.index}]"
-        rt += f"\r\n   Offsets(Modified? {self.offset.modified}): [{self.offset.data}]"
-        rt += f"\r\nBackground(Modified? {self.background.modified}): [{self.background.data}]"
-        rt += f"\r\n   Bubbles(Modified? {self.bubbles.modified}): [{self.bubbles.data}]"
+        rt += f"\r\nBackground(Offset: [{self.background.offset.getHex()}] Modified? {self.background.bgIdx.modified}): [{self.background.bgIdx.data}]"
+        rt += f"\r\n   Bubbles(Offset: [{self.offset.getHex()}] Modified? {self.bubbles.modified}): [{self.bubbles.data}]"
         return rt
-    
+#
+# 
+#
 LEVEL_MIN = 1
 LEVEL_MAX = 99
 BACKGROUND_MIN = 1
@@ -67,14 +82,22 @@ class Struct_Game():
         self.levels      = []
         self.palette     = []
         self.backgrounds = [] 
+        self._setBackgrounds()
+        self._setPalette()
         self._setLevels()
-
+        
+#
+# Levels
+#
     def _setLevels(self):
         self.levels = []
         for lvlidx in range(LEVEL_MIN,LEVEL_MAX+1):
             parsedLevel = LevelParse(rompath=self.rom_path,lvlIdx=lvlidx)
-            parsedBG    = BackgroundTableOffset(index=lvlidx)
-            self.levels.append(Struct_Level(index=lvlidx,offset=parsedLevel.offset,background=parsedBG,bubbles=parsedLevel.bubbles))
+            #TODO -- i hate im doing a parse direct here but the BG values are that easy....
+            bgOffset = BackgroundTableOffset(index=lvlidx)
+            parsedBG = parse_rom(self.rom_path,start=bgOffset.getHex(),distance=bgOffset.CONST_OFFSET_BG_LENGTH)
+            structBG = Struct_Background(bgOffset,parsedBG)
+            self.levels.append(Struct_Level(index=lvlidx,offset=parsedLevel.offset,background=structBG,bubbles=parsedLevel.bubbles))
 
     def getLevelByIndex(self,index:int=1)->Struct_Level:
         if index < 1:
@@ -82,7 +105,21 @@ class Struct_Game():
             return None
         else:
             return self.levels[index-1]
-
+#
+# Backgrounds
+#
+    def _setBackgrounds(self):
+        for i in range(16):
+            self.backgrounds.append(f"{i:02X}")
+#
+# Palettes
+#
+    def _setPalette(self):
+        colorsFromRom = PaletteParse(rompath=self.rom_path)
+        self.palette  = colorsFromRom.palettes
+#
+#
+#
     def __str__(self):
         rt  = f"ROM [{self.rom_path}]"
         rt += f"\r\nCounts: Levels [{len(self.levels)}] Backgrounds: [{len(self.backgrounds)}] "
@@ -94,5 +131,5 @@ class Struct_Game():
     def toJSON(self):
         rt = JSONExport_Game()
         rt.rompath = self.rom_path
-        return rt
+        return asdict(rt)
         

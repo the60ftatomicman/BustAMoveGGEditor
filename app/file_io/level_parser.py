@@ -28,12 +28,6 @@ class LevelParse:
         useIdx = lvlIdx if lvlIdx != None else self.level_index
         self.offset = LevelTableOffset(index=useIdx)
 
-    def getOffsetInt(self):
-        return self.offset.getInt()
-
-    def getOffsetHex(self):
-        return self.offset.getHex()
-
     def setBubbles(self,bubbles:list=None):
         self.bubbles = []
         if bubbles != None:
