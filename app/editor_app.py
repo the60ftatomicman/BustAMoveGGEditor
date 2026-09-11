@@ -29,7 +29,7 @@ class EditorApp(tk.Tk):
 
         # Build self
         self.title("BustAMove GG Editor")
-        self.resizable(False, False)
+        self.resizable(True, False)
 
         # Define the different frames that will hold different controls.
         self.frame_toolbar      = None
@@ -45,19 +45,26 @@ class EditorApp(tk.Tk):
         self._build_toolbar()
         #self._build_canvas()
         #self._build_statusbar()
+        self.geometry('900x300')
+        self.grid_propagate(False)
 
     def _build_toolbar(self):
-        toolbar = tk.Frame(self, padx=8, pady=8)
+        toolbar = tk.Frame(self, padx=8, pady=8,width=900)
         toolbar.grid(row=0,column=0)
+
         ## Converted over controls
         self.rom_select_control = rom_selector(toolbar)
         self.rom_select_control.element_input.bind("<<RomChanged>>",self._on_rom_changed)
-        #self.cellsize_control   = gridsize_selector(toolbar)
-        #self.cellsize_control.element.bind("<<ComboboxSelected>>", self._on_cell_size_changed)
-        #self.background_control = background_selector(toolbar)
-        #self.background_control.element.bind("<<ComboboxSelected>>", lambda event: self.background_control.on_changed(event, "Hackapoo"))
-        #self.level_control      = level_selector(toolbar,ROM_PATH)
-        #self.level_control.element.bind("<<ComboboxSelected>>", lambda event: self.level_control.on_changed(event, "Hackapoo"))
+
+        self.level_control = level_selector(parentFrame=toolbar,r=1,c=0,rompath=ROM_PATH)
+        self.level_control.element.bind("<<ComboboxSelected>>", lambda event: self.level_control.on_changed(event, "Hackapoo"))
+
+        self.background_control = background_selector(parentFrame=toolbar,r=1,c=1)
+        self.background_control.element.bind("<<ComboboxSelected>>", lambda event: self.background_control.on_changed(event, "Hackapoo"))
+
+        self.cellsize_control   = gridsize_selector(toolbar,r=2,c=0)
+        self.cellsize_control.element.bind("<<ComboboxSelected>>", self._on_cell_size_changed)
+
         ## TBD
         #palette_frame = tk.Frame(self, padx=8)
         #palette_frame.pack(side=tk.TOP, fill=tk.X, pady=(0, 8))
@@ -93,16 +100,6 @@ class EditorApp(tk.Tk):
 
     def _on_color_selected(self, color):
         self.grid_canvas.set_current_color(color)
-
-    def _refresh_window_size(self):
-        """Reset the toplevel's requested geometry so it re-fits its contents.
-
-        Tk locks the window to its mapped size after the first draw, so
-        without this, growing/shrinking the canvas would leave the window
-        the wrong size (clipping or leaving empty space around the grid).
-        """
-        self.update_idletasks()
-        self.geometry("")
 
     def _on_dimensions_changed(self, _event):
         #rows = self.rows_var.get()

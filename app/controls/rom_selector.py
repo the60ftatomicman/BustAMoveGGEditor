@@ -1,14 +1,15 @@
 import tkinter as tk
 from tkinter import ttk
 from tkinter import filedialog as fd
+from app.controls.section import section
 
 DEFAULT_FILEPATH = ".\\"
 ROM_FILETYPES = (
     ('ROM files', '*.gg'),
     ('All files', '*.*')
 )
-class rom_selector():
-    def __init__(self,parentFrame:tk.Frame=None):
+class rom_selector(section):
+    def __init__(self,parentFrame:tk.Frame=None,r:int=0,c:int=0):
         self.options       = None
         self.value         = None
         self.frame         = None
@@ -20,7 +21,7 @@ class rom_selector():
         else:
             self.value = tk.StringVar(value="")
             self.frame = tk.Frame(parentFrame)
-            self.frame.grid(row=0, column=0)
+            self.frame.grid(row=r, column=c,columnspan=3)
             
             self.element_label = tk.Label(self.frame, text="Rom File:")
             self.element_label.grid(row=0, column=0)

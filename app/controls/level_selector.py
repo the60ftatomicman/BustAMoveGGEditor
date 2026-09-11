@@ -14,7 +14,7 @@ class Level:
 
 DEFAULT_LEVEL = 1
 class level_selector():
-    def __init__(self,parentFrame:tk.Frame=None,rompath:str=None):
+    def __init__(self,parentFrame:tk.Frame=None,r:int=0,c:int=0,rompath:str=None):
         self.options    = None
         self.selection  = None
         self.value      = None
@@ -26,22 +26,22 @@ class level_selector():
             print("No parent frame provided for level selector. Skipping level selector creation.")
         else:
             self.frame = tk.Frame(parentFrame)
-            self.frame.pack(side=tk.LEFT, padx=(0, 16))
+            self.frame.grid(row=r,column=c)
             self.options   = [Level(index=i, level=LevelParse(rompath,i), bgOffset=BackgroundTableOffset(index=i-1)) for i in range(LEVEL_MIN, LEVEL_MAX + 1)]
             self.selection = tk.IntVar(value=DEFAULT_LEVEL)
             self.value     = self.options[self.selection.get() - 1].level
-            tk.Label(self.frame, text="Levels:").grid(row=0, column=0, sticky="w")
+            tk.Label(self.frame, text="Levels:").grid(row=0, column=0)
             self.element = ttk.Combobox(
                 self.frame,
                 textvariable=self.selection,
                 values=[i for i in range(LEVEL_MIN, LEVEL_MAX + 1)],
-                width=4,
+                width=3,
                 state="readonly",
             )
             self.element.grid(row=0, column=1, sticky="w", padx=(4, 0))
 
-            self.name_label = tk.Label(self.frame, textvariable=self.selection, anchor="w")
-            self.name_label.grid(row=1, column=0, columnspan=2, sticky="w")
+            self.name_label = tk.Label(self.frame, textvariable=self.selection)
+            self.name_label.grid(row=0, column=2)
 
     def on_changed(self, event, p:str):
         print(f"Level selection changed: {self.selection.get()} (triggered by {p})")

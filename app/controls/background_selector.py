@@ -31,7 +31,7 @@ BACKGROUND_LOOKUP = {bg.description: bg.code for bg in BACKGROUND_TOTAL}
 BACKGROUND_OPTIONS= [bg.description for bg in BACKGROUND_TOTAL]
 
 class background_selector():
-    def __init__(self,parentFrame:tk.Frame=None):
+    def __init__(self,parentFrame:tk.Frame=None,r:int=0,c:int=0):
         self.selection = tk.StringVar(value=DEFAULT_BACKGROUND)
         self.value     = tk.StringVar(value=BACKGROUND_LOOKUP[DEFAULT_BACKGROUND])
         self.frame     = None
@@ -39,20 +39,20 @@ class background_selector():
             print("No parent frame provided for background selector. Skipping background selector creation.")
         else:
             self.frame = tk.Frame(parentFrame)
-            self.frame.pack(side=tk.LEFT, padx=(0, 16))
-
-            tk.Label(self.frame, text="Backgrounds:").grid(row=0, column=0, sticky="w")
+            self.frame.grid(row=r,column=c)
+            tk.Label(self.frame, text="Backgrounds:").grid(row=0, column=0)
+            longestOption = max(len(opts) for opts in BACKGROUND_OPTIONS)
+            print(f"Longest option is: {longestOption}", )
             self.element = ttk.Combobox(
                 self.frame,
                 textvariable=self.selection,
                 values=BACKGROUND_OPTIONS,
-                width=4,
-                state="readonly",
+                width=longestOption,
+                state="readonly"
             )
-            self.element.grid(row=0, column=1, sticky="w", padx=(4, 0))
-
-            background_name_label = tk.Label(self.frame, textvariable=self.selection, anchor="w")
-            background_name_label.grid(row=1, column=0, columnspan=2, sticky="w")
+            self.element.grid(row=0, column=1)
+            background_name_label = tk.Label(self.frame, textvariable=self.value)
+            background_name_label.grid(row=0, column=2)
 
     def on_changed(self, event,p:str):
         print(f"Background selection changed: {self.selection.get()} (triggered by {p})")
