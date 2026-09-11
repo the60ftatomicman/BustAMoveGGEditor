@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 import tkinter as tk
 from tkinter import ttk
-
+from app.controls.section import section
 
 @dataclass
 class Background:
@@ -30,29 +30,25 @@ BACKGROUND_TOTAL = [
 BACKGROUND_LOOKUP = {bg.description: bg.code for bg in BACKGROUND_TOTAL}
 BACKGROUND_OPTIONS= [bg.description for bg in BACKGROUND_TOTAL]
 
-class background_selector():
+class background_selector(section):
     def __init__(self,parentFrame:tk.Frame=None,r:int=0,c:int=0):
+        super().__init__(name=self.__class__.__name__,parentFrame=parentFrame,r=r,c=c)
+
         self.selection = tk.StringVar(value=DEFAULT_BACKGROUND)
         self.value     = tk.StringVar(value=BACKGROUND_LOOKUP[DEFAULT_BACKGROUND])
-        self.frame     = None
-        if parentFrame is None:
-            print("No parent frame provided for background selector. Skipping background selector creation.")
-        else:
-            self.frame = tk.Frame(parentFrame)
-            self.frame.grid(row=r,column=c)
-            tk.Label(self.frame, text="Backgrounds:").grid(row=0, column=0)
-            longestOption = max(len(opts) for opts in BACKGROUND_OPTIONS)
-            print(f"Longest option is: {longestOption}", )
-            self.element = ttk.Combobox(
-                self.frame,
-                textvariable=self.selection,
-                values=BACKGROUND_OPTIONS,
-                width=longestOption,
-                state="readonly"
-            )
-            self.element.grid(row=0, column=1)
-            background_name_label = tk.Label(self.frame, textvariable=self.value)
-            background_name_label.grid(row=0, column=2)
+        
+
+        tk.Label(self.frame, text="Backgrounds:").grid(row=0, column=0)
+        self.element = ttk.Combobox(
+            self.frame,
+            textvariable=self.selection,
+            values=BACKGROUND_OPTIONS,
+            width=max(len(opts) for opts in BACKGROUND_OPTIONS),
+            state="readonly"
+        )
+        self.element.grid(row=0, column=1)
+        background_name_label = tk.Label(self.frame, textvariable=self.value)
+        background_name_label.grid(row=0, column=2)
 
     def on_changed(self, event,p:str):
         print(f"Background selection changed: {self.selection.get()} (triggered by {p})")

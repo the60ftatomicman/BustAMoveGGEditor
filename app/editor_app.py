@@ -9,6 +9,7 @@ from app.controls.background_selector import background_selector
 from app.controls.level_selector import level_selector
 from app.controls.rom_selector import rom_selector
 from app.controls.gridsize_selector import gridsize_selector,CONST_DEFAULT_CELL_SIZE
+from app.controls.section import section
 from .canvas_grid import PixelGridCanvas
 from .color_palette import ColorPalette
 
@@ -49,20 +50,21 @@ class EditorApp(tk.Tk):
         self.grid_propagate(False)
 
     def _build_toolbar(self):
-        toolbar = tk.Frame(self, padx=8, pady=8,width=900)
-        toolbar.grid(row=0,column=0)
-
+        #toolbar = tk.Frame(self, padx=8, pady=8,width=900,borderwidth=2, relief="ridge")
+        #toolbar.grid(row=0,column=0)
+        self.frame_toolbar = tk.Frame(self, padx=8, pady=8,width=900,borderwidth=2, relief="ridge")
+        self.frame_toolbar.grid(row=0,column=0)
         ## Converted over controls
-        self.rom_select_control = rom_selector(toolbar)
+        self.rom_select_control = rom_selector(self.frame_toolbar,cspan=3)
         self.rom_select_control.element_input.bind("<<RomChanged>>",self._on_rom_changed)
 
-        self.level_control = level_selector(parentFrame=toolbar,r=1,c=0,rompath=ROM_PATH)
+        self.level_control = level_selector(parentFrame=self.frame_toolbar,r=1,c=0,rompath=ROM_PATH)
         self.level_control.element.bind("<<ComboboxSelected>>", lambda event: self.level_control.on_changed(event, "Hackapoo"))
 
-        self.background_control = background_selector(parentFrame=toolbar,r=1,c=1)
+        self.background_control = background_selector(parentFrame=self.frame_toolbar,r=1,c=1)
         self.background_control.element.bind("<<ComboboxSelected>>", lambda event: self.background_control.on_changed(event, "Hackapoo"))
 
-        self.cellsize_control   = gridsize_selector(toolbar,r=2,c=0)
+        self.cellsize_control   = gridsize_selector(self.frame_toolbar,r=2,c=0)
         self.cellsize_control.element.bind("<<ComboboxSelected>>", self._on_cell_size_changed)
 
         ## TBD

@@ -4,6 +4,7 @@ from tkinter import ttk
 from app.file_io.level_parser import LevelParse
 from app.file_io.offset import BackgroundTableOffset
 from app.data_structures.game_structures import LEVEL_MIN,LEVEL_MAX
+from app.controls.section import section
 
 ## TODO -- do we want the level to be a levelParse or LevelOffset?
 @dataclass
@@ -13,35 +14,31 @@ class Level:
     bgOffset: BackgroundTableOffset
 
 DEFAULT_LEVEL = 1
-class level_selector():
+class level_selector(section):
     def __init__(self,parentFrame:tk.Frame=None,r:int=0,c:int=0,rompath:str=None):
+        super().__init__(name=self.__class__.__name__,parentFrame=parentFrame,r=r,c=c)
+
         self.options    = None
         self.selection  = None
         self.value      = None
-        self.frame      = None
         self.name_label = None
-        self.element       = None
-        
-        if parentFrame is None:
-            print("No parent frame provided for level selector. Skipping level selector creation.")
-        else:
-            self.frame = tk.Frame(parentFrame)
-            self.frame.grid(row=r,column=c)
-            self.options   = [Level(index=i, level=LevelParse(rompath,i), bgOffset=BackgroundTableOffset(index=i-1)) for i in range(LEVEL_MIN, LEVEL_MAX + 1)]
-            self.selection = tk.IntVar(value=DEFAULT_LEVEL)
-            self.value     = self.options[self.selection.get() - 1].level
-            tk.Label(self.frame, text="Levels:").grid(row=0, column=0)
-            self.element = ttk.Combobox(
-                self.frame,
-                textvariable=self.selection,
-                values=[i for i in range(LEVEL_MIN, LEVEL_MAX + 1)],
-                width=3,
-                state="readonly",
-            )
-            self.element.grid(row=0, column=1, sticky="w", padx=(4, 0))
+        self.element    = None
+ 
+        self.options   = [Level(index=i, level=LevelParse(rompath,i), bgOffset=BackgroundTableOffset(index=i-1)) for i in range(LEVEL_MIN, LEVEL_MAX + 1)]
+        self.selection = tk.IntVar(value=DEFAULT_LEVEL)
+        self.value     = self.options[self.selection.get() - 1].level
+        tk.Label(self.frame, text="Levels:").grid(row=0, column=0)
+        self.element = ttk.Combobox(
+            self.frame,
+            textvariable=self.selection,
+            values=[i for i in range(LEVEL_MIN, LEVEL_MAX + 1)],
+            width=3,
+            state="readonly",
+        )
+        self.element.grid(row=0, column=1, sticky="w", padx=(4, 0))
 
-            self.name_label = tk.Label(self.frame, textvariable=self.selection)
-            self.name_label.grid(row=0, column=2)
+        self.name_label = tk.Label(self.frame, textvariable=self.selection)
+        self.name_label.grid(row=0, column=2)
 
     def on_changed(self, event, p:str):
         print(f"Level selection changed: {self.selection.get()} (triggered by {p})")
