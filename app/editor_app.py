@@ -30,7 +30,7 @@ class EditorApp(tk.Tk):
 
         # Build self
         self.title("BustAMove GG Editor")
-        self.resizable(True, False)
+        self.resizable(False, True)
 
         # Define the different frames that will hold different controls.
         self.frame_toolbar      = None
@@ -46,23 +46,22 @@ class EditorApp(tk.Tk):
         self._build_toolbar()
         #self._build_canvas()
         #self._build_statusbar()
-        self.geometry('900x300')
+        self.geometry('420x300')
         self.grid_propagate(False)
 
     def _build_toolbar(self):
-        #toolbar = tk.Frame(self, padx=8, pady=8,width=900,borderwidth=2, relief="ridge")
-        #toolbar.grid(row=0,column=0)
-        self.frame_toolbar = tk.Frame(self, padx=8, pady=8,width=900,borderwidth=2, relief="ridge")
+        self.frame_toolbar = tk.Frame(self, padx=8, pady=8,borderwidth=2, relief="ridge")
         self.frame_toolbar.grid(row=0,column=0)
+
         ## Converted over controls
-        self.rom_select_control = rom_selector(self.frame_toolbar,cspan=3)
+        self.rom_select_control = rom_selector(self.frame_toolbar,cspan=2)
         self.rom_select_control.element_input.bind("<<RomChanged>>",self._on_rom_changed)
 
-        self.level_control = level_selector(parentFrame=self.frame_toolbar,r=1,c=0,rompath=ROM_PATH)
-        self.level_control.element.bind("<<ComboboxSelected>>", lambda event: self.level_control.on_changed(event, "Hackapoo"))
+        self.level_control = level_selector(parentFrame=self.frame_toolbar,r=1,c=0)
+        self.level_control.element.bind("<<ComboboxSelected>>",self._on_level_selection)
 
         self.background_control = background_selector(parentFrame=self.frame_toolbar,r=1,c=1)
-        self.background_control.element.bind("<<ComboboxSelected>>", lambda event: self.background_control.on_changed(event, "Hackapoo"))
+        self.background_control.element.bind("<<ComboboxSelected>>",self._on_bg_selection)
 
         self.cellsize_control   = gridsize_selector(self.frame_toolbar,r=2,c=0)
         self.cellsize_control.element.bind("<<ComboboxSelected>>", self._on_cell_size_changed)
@@ -100,6 +99,10 @@ class EditorApp(tk.Tk):
         status = tk.Label(self, textvariable=self.status_var, anchor="w", relief=tk.SUNKEN)
         status.pack(side=tk.BOTTOM, fill=tk.X)
 
+    ##
+    ##
+    ##
+
     def _on_color_selected(self, color):
         self.grid_canvas.set_current_color(color)
 
@@ -115,12 +118,6 @@ class EditorApp(tk.Tk):
         self.grid_canvas.resize_grid(DEFAULT_GRID_ROWS, DEFAULT_GRID_COLUMNS, cell_size=cell_size)
         self.status_var.set(f"Cell size: {cell_size}px")
         self._refresh_window_size()
-
-    def _on_rom_changed(self,_event):
-        rp = self.rom_select_control.getRomPath()
-        print(f"ROM file was changed to [{rp}]")
-        self.game = Struct_Game(rp)
-        print(self.game)
 
     def _on_clear(self):
         self.grid_canvas.clear()
@@ -140,3 +137,29 @@ class EditorApp(tk.Tk):
         if hex_color:
             self.grid_canvas.set_canvas_bg_color(hex_color)
             self.status_var.set(f"Canvas background: {hex_color}")
+
+    ##
+    ## Input Command Events
+    ## 
+
+    def _on_rom_changed(self,_event):
+        rp = self.rom_select_control.getRomPath()
+        print(f"ROM file was changed to [{rp}]")
+        self.game = Struct_Game(rp)
+        print(self.game)
+
+        self.level_control.set_options(self.game.levels)
+        self.level_control.on_changed(1)
+
+        self.background_control.on_changed(bgIdx=self.game.levels[1].getBackgroundCode())
+
+    def _on_level_selection(self,_event):
+        print(f"Switching LVL")
+        self.level_control.on_changed()
+        lvl = self.game.levels[self.level_control.value.get()]
+        self.background_control.on_changed(bgIdx=lvl.getBackgroundCode())
+
+    def _on_bg_selection(self,_event):
+        print(f"Switching BG")
+        self.background_control.on_changed()
+        self.game.levels[self.level_control.value.get()].setBackgroundCode(self.background_control.value.get())

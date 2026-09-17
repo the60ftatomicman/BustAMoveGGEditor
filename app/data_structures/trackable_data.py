@@ -24,7 +24,7 @@ class TrackableData():
     @data.setter
     def data(self, value: Any):
         """On our first setting, we set the Initial value, otherwise we set CURRENT"""
-        # If explicitly clearing the data
+        # If explicitly clearing the data TODO -- make NONE our reset ?
         if value is None:
             self._data = {TrackableDataStatus.Initial: None, TrackableDataStatus.Current: None}
             self.modified = False

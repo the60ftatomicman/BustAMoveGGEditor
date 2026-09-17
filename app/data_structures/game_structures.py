@@ -22,8 +22,19 @@ class Struct_Background:
     def __init__(self,offset:UniversalOffset=None,bgIdx:int=0):
         self.offset     = offset
         self.bgIdx      = TrackableData()
+        self.bgIdx.data = bgIdx #Despite being an IDX, its the hex value you WILL put into the code!
+    def getBGCode(self):
+        return self.bgIdx.data
+    def setBGCode(self,bgIdx:str=None):
         self.bgIdx.data = bgIdx
-#
+
+        if bgIdx != None:
+            print(f"Set BGIndex at: {self.offset.getHex()} to: {self.bgIdx.data}")
+        else:
+            print(f"Reset BGIndex at: {self.offset.getHex()} to: {self.bgIdx.data}")
+        
+
+#   
 #
 #
 class Struct_Level():
@@ -36,6 +47,11 @@ class Struct_Level():
         self.bubbles.data = bubbles
         self.background   = background
 
+    def getBackgroundCode(self):
+        return self.background.getBGCode()
+    def setBackgroundCode(self,bgIdx:str=None):
+        return self.background.setBGCode(bgIdx)
+    
     def getBubblesAsAsciiDiagram(self):
         bubbles = self.bubbles.data
         result  = "    1 2 3 4 5 6 7 8 \r\n"
@@ -96,7 +112,7 @@ class Struct_Game():
             #TODO -- i hate im doing a parse direct here but the BG values are that easy....
             bgOffset = BackgroundTableOffset(index=lvlidx)
             parsedBG = parse_rom(self.rom_path,start=bgOffset.getHex(),distance=bgOffset.CONST_OFFSET_BG_LENGTH)
-            structBG = Struct_Background(bgOffset,parsedBG)
+            structBG = Struct_Background(bgOffset,parsedBG[0])
             self.levels.append(Struct_Level(index=lvlidx,offset=parsedLevel.offset,background=structBG,bubbles=parsedLevel.bubbles))
 
     def getLevelByIndex(self,index:int=1)->Struct_Level:

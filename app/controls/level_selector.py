@@ -1,55 +1,40 @@
 from dataclasses import dataclass
 import tkinter as tk
 from tkinter import ttk
-from app.file_io.level_parser import LevelParse
-from app.file_io.offset import BackgroundTableOffset
-from app.data_structures.game_structures import LEVEL_MIN,LEVEL_MAX
 from app.controls.section import section
 
-## TODO -- do we want the level to be a levelParse or LevelOffset?
-@dataclass
-class Level:
-    index: int
-    level: LevelParse
-    bgOffset: BackgroundTableOffset
-
 DEFAULT_LEVEL = 1
+##
+## What I want out of this is:
+## 1) to set options based on what the game_structure returns with as it's length for it's levels parameter.
+## 2) That when this has it's selection changed, we also fire an event to change the BACKGROUND selector
+## 3) Eventually we will do that with the bubbles as well.
+
 class level_selector(section):
-    def __init__(self,parentFrame:tk.Frame=None,r:int=0,c:int=0,rompath:str=None):
+    def __init__(self,parentFrame:tk.Frame=None,r:int=0,c:int=0):
         super().__init__(name=self.__class__.__name__,parentFrame=parentFrame,r=r,c=c)
 
-        self.options    = None
-        self.selection  = None
-        self.value      = None
-        self.name_label = None
-        self.element    = None
- 
-        self.options   = [Level(index=i, level=LevelParse(rompath,i), bgOffset=BackgroundTableOffset(index=i-1)) for i in range(LEVEL_MIN, LEVEL_MAX + 1)]
-        self.selection = tk.IntVar(value=DEFAULT_LEVEL)
-        self.value     = self.options[self.selection.get() - 1].level
+        self.options      = []
+        self.value        = tk.IntVar()
+        self.element      = None
+
         tk.Label(self.frame, text="Levels:").grid(row=0, column=0)
         self.element = ttk.Combobox(
             self.frame,
-            textvariable=self.selection,
-            values=[i for i in range(LEVEL_MIN, LEVEL_MAX + 1)],
+            textvariable=self.value,
+            values=self.options,
             width=3,
             state="readonly",
         )
         self.element.grid(row=0, column=1, sticky="w", padx=(4, 0))
 
-        self.name_label = tk.Label(self.frame, textvariable=self.selection)
-        self.name_label.grid(row=0, column=2)
+    def set_options(self,options:list=None):
+        opts = options if options is not None else self.options
+        self.options = [i for i in range(1, len(opts) + 1)]
+        self.element['values'] = self.options
+        self.value.set(DEFAULT_LEVEL)
 
-    def on_changed(self, event, p:str):
-        print(f"Level selection changed: {self.selection.get()} (triggered by {p})")
-        self._setValue()
-
-    def _setValue(self, level_index:int=None):
-        selection = level_index if level_index is not None else self.selection.get()
-        self.value = self.options[selection-1].level
-        bg = self.options[selection-1].bgOffset
-        self.selection.set(selection)
-        print(f"Level {self.selection.get()}")
-        print(f"Level Offsets: [{self.value.getOffsetHex()}, {self.value.getOffsetInt()}]")
-        print(f"Level BG Offsets [{bg.getHex()}, {bg.getInt()}]")
-        print(self.value.getBubblesAsAsciiDiagram())
+    def on_changed(self,level_index:int=None):
+        print(f"Level selection changed. Current: {self.value.get()} Override: {level_index}")
+        value  = level_index if level_index is not None else self.value.get()
+        self.value.set(value)
