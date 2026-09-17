@@ -23,15 +23,15 @@ class Struct_Background:
         self.offset     = offset
         self.bgIdx      = TrackableData()
         self.bgIdx.data = bgIdx #Despite being an IDX, its the hex value you WILL put into the code!
+
+    def isModified(self):
+        return self.bgIdx.modified
+
     def getBGCode(self):
         return self.bgIdx.data
+
     def setBGCode(self,bgIdx:str=None):
         self.bgIdx.data = bgIdx
-
-        if bgIdx != None:
-            print(f"Set BGIndex at: {self.offset.getHex()} to: {self.bgIdx.data}")
-        else:
-            print(f"Reset BGIndex at: {self.offset.getHex()} to: {self.bgIdx.data}")
         
 
 #   
@@ -148,4 +148,11 @@ class Struct_Game():
         rt = JSONExport_Game()
         rt.rompath = self.rom_path
         return asdict(rt)
-        
+
+    def to_ips_patch(self):
+        data  = "IPS PATCH\n"
+        for level in self.levels:
+            if level.background.isModified():
+                data += f"{level.background.offset.getHex()}::{level.getBackgroundCode()}\n"
+        data += "END"
+        return data

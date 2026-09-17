@@ -146,7 +146,6 @@ class EditorApp(tk.Tk):
         rp = self.rom_select_control.getRomPath()
         print(f"ROM file was changed to [{rp}]")
         self.game = Struct_Game(rp)
-        print(self.game)
 
         self.level_control.set_options(self.game.levels)
         self.level_control.on_changed(1)
@@ -156,10 +155,11 @@ class EditorApp(tk.Tk):
     def _on_level_selection(self,_event):
         print(f"Switching LVL")
         self.level_control.on_changed()
-        lvl = self.game.levels[self.level_control.value.get()]
+        lvl = self.game.getLevelByIndex(self.level_control.value.get())
         self.background_control.on_changed(bgIdx=lvl.getBackgroundCode())
 
     def _on_bg_selection(self,_event):
         print(f"Switching BG")
         self.background_control.on_changed()
-        self.game.levels[self.level_control.value.get()].setBackgroundCode(self.background_control.value.get())
+        self.game.getLevelByIndex(self.level_control.value.get()).setBackgroundCode(self.background_control.value.get())
+        print(self.game.to_ips_patch())

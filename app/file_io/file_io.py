@@ -35,5 +35,3 @@ def parse_rom(fp:str,start:str="0x00000",distance:int=None):
             return result_array
     except FileNotFoundError:
         print(f"Error: The file '{fp}' was not found.")
-
-#parse_rom('E:\\EMU\\GENESIS\\aspectedit\\bustamoveGGeditor\\Bust-A-Move (USA).gg',start="0x3D59B",distance=35)
