@@ -3,15 +3,13 @@ import tkinter as tk
 from tkinter import ttk
 from tkinter import colorchooser
 
+from app.controls.palette_selector import palette_selector
 from app.data_structures.game_structures import Struct_Game
-from app.file_io.palette_parser import PaletteParse
 from app.controls.background_selector import background_selector
 from app.controls.level_selector import level_selector
 from app.controls.rom_selector import rom_selector
 from app.controls.gridsize_selector import gridsize_selector,CONST_DEFAULT_CELL_SIZE
-from app.controls.section import section
 from .canvas_grid import PixelGridCanvas
-from .color_palette import ColorPalette
 
 DEFAULT_GRID_ROWS    = 9
 DEFAULT_GRID_COLUMNS = 8
@@ -44,9 +42,9 @@ class EditorApp(tk.Tk):
         self.level_control      = None
 
         self._build_toolbar()
-        #self._build_canvas()
+        self._build_canvas()
         #self._build_statusbar()
-        self.geometry('420x300')
+        self.geometry('420x500')
         self.grid_propagate(False)
 
     def _build_toolbar(self):
@@ -65,11 +63,9 @@ class EditorApp(tk.Tk):
 
         self.cellsize_control   = gridsize_selector(self.frame_toolbar,r=2,c=0)
         self.cellsize_control.element.bind("<<ComboboxSelected>>", self._on_cell_size_changed)
-
         ## TBD
         #palette_frame = tk.Frame(self, padx=8)
         #palette_frame.pack(side=tk.TOP, fill=tk.X, pady=(0, 8))
-        #self.palette_colors = PaletteParse(rompath=ROM_PATH)
         #self.palette = ColorPalette(palette_frame, on_color_selected=self._on_color_selected,colors=self.palette_colors.getPalettesAsRGBHex())
         #self.palette.pack(side=tk.LEFT)
 
@@ -83,15 +79,18 @@ class EditorApp(tk.Tk):
         #canvas_bg_button.pack(side=tk.LEFT, padx=(8, 0))
 
     def _build_canvas(self):
-        canvas_frame = tk.Frame(self, padx=8, pady=8)
-        canvas_frame.pack(side=tk.TOP)
-        self.grid_canvas = PixelGridCanvas(
-            canvas_frame,
-            rows=DEFAULT_GRID_ROWS,
-            columns=DEFAULT_GRID_COLUMNS,
-            cell_size=CONST_DEFAULT_CELL_SIZE,
-        )
-        self.grid_canvas.pack()
+        self.frame_canvas = tk.Frame(self, padx=8, pady=8,borderwidth=2, relief="ridge")
+        self.frame_canvas.grid(row=1,column=0,columnspan=2)
+        self.palette_control = palette_selector(self.frame_canvas,r=0,c=0)
+        #canvas_frame = tk.Frame(self, padx=8, pady=8)
+        #canvas_frame.pack(side=tk.TOP)
+        #self.grid_canvas = PixelGridCanvas(
+        #    canvas_frame,
+        #    rows=DEFAULT_GRID_ROWS,
+        #    columns=DEFAULT_GRID_COLUMNS,
+        #    cell_size=CONST_DEFAULT_CELL_SIZE,
+        #)
+        #self.grid_canvas.pack()
         #self.grid_canvas.set_current_color(self.palette.current_color)
 
     def _build_statusbar(self):
@@ -151,6 +150,7 @@ class EditorApp(tk.Tk):
         self.level_control.on_changed(1)
 
         self.background_control.on_changed(bgIdx=self.game.levels[1].getBackgroundCode())
+        self.palette_control.set_colors(self.game.palette)
 
     def _on_level_selection(self,_event):
         print(f"Switching LVL")
