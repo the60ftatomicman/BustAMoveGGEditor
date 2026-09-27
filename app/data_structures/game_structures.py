@@ -1,11 +1,10 @@
 
 from app.file_io.file_io import parse_rom
-from app.file_io.offset import UniversalOffset,BackgroundTableOffset
+from app.file_io.offset import UniversalOffset,BackgroundTableOffset,PaletteTableOffset
 from app.file_io.level_parser import LevelParse,CONST_LEVEL_HEIGHT,CONST_LEVEL_WIDTH
 from app.file_io.export_formats import JSONExport_Game
 from app.data_structures.trackable_data import TrackableData
 from dataclasses import asdict
-from app.file_io.palette_parser import PaletteParse
 from app.data_structures.color_structure import Colors
 #
 #
@@ -131,8 +130,16 @@ class Struct_Game():
 # Palettes
 #
     def _setPalette(self):
-        colorsFromRom = PaletteParse(rompath=self.rom_path)
-        self.palette  = colorsFromRom.palettes
+        self.palette = []
+        for i in range(1, 15):
+            paletteOffset = PaletteTableOffset(i)
+            parsedPalette = parse_rom(self.rom_path,start=paletteOffset.getHex(),distance=paletteOffset.CONST_OFFSET_PL_LENGTH)
+            print(parsedPalette)
+            color = Colors()
+            color.fromGameGearBytes(parsedPalette[1],parsedPalette[0])
+            struct = Struct_Palette(paletteOffset,color)
+            self.palette.append(struct)
+        
 #
 #
 #

@@ -60,4 +60,4 @@ class PaletteTableOffset(TableOffset):
     CONST_OFFSET_PL_LENGTH = 2
     CONST_OFFSET_PL_START  = "0x3E3A5"
     def __init__(self,index:int=None):
-        super().__init__(name="BackgroundTableOffset",startIdx=self.CONST_OFFSET_PL_START,idx=index,entryByteLength=self.CONST_OFFSET_PL_LENGTH)
+        super().__init__(name="PaletteTableOffset",startIdx=self.CONST_OFFSET_PL_START,idx=index,entryByteLength=self.CONST_OFFSET_PL_LENGTH)
